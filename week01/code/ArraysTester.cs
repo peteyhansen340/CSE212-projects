@@ -34,12 +34,19 @@ public static class ArraysTester {
     /// <returns>array of doubles that are the multiples of the supplied number</returns>
     private static double[] MultiplesOf(double number, int length)
     {
-        // TODO Problem 1 Start
-        // Remember: Using comments in your program, write down your process for solving this problem
-        // step by step before you write the code. The plan should be clear enough that it could
-        // be implemented by another person.
-
-        return new double[0]; // replace this return statement with your own
+        // define the function signature
+        list<double> multiples = new List<double>();
+        // use a look to generate multiples
+        for (int i=1; i<= length; i++) {
+        // multiply the statring number by the loop index to get the current multiple 
+            double multiple = number * i;
+        //add the current multiple to the list 
+            multiples.Add(multiple);
+        }
+        
+        
+        //convert the list to an array and return it 
+        return multiples.ToArray();
     }
     
     /// <summary>
@@ -52,10 +59,25 @@ public static class ArraysTester {
     /// </summary>
     private static void RotateListRight(List<int> data, int amount)
     {
-        // TODO Problem 2 Start
-        // Remember: Using comments in your program, write down your process for solving this problem
-        // step by step before you write the code. The plan should be clear enough that it could
-        // be implemented by another person.
+        // define the function signature 
+        // this function takes a list<int> and integar amount 
+        int length = data.Count; 
+        amount= amount % length; // calculate the affective number of rotation 
+
+
+        // perform the rotation 
+        // Slice the list into two parts and concatenate them in rotated order
+        // The first part is from the end of the list based on the rotation amount
+        // The second part is from the start of the list up to the calculated split point
+        list<int> rotatedPart = data.GetRange(length - amount, amount);
+        list<int> remainingPart = data.GetRange(0, length - amount);
+
+        // update the original list 
+        data.clear();
+        data.AddRange(rotatedPart);
+        dada.AddRange(remainingPart);
+        
+        
 
     }
 }
