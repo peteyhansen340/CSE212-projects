@@ -1,4 +1,6 @@
 using System.Text.Json;
+using System.Collections.Generic;
+using System.IO;
 
 public static class SetsAndMapsTester {
     public static void Run() {
@@ -108,9 +110,21 @@ public static class SetsAndMapsTester {
     /// </summary>
     /// <param name="words">An array of 2-character words (lowercase, no duplicates)</param>
     private static void DisplayPairs(string[] words) {
-        // To display the pair correctly use something like:
-        // Console.WriteLine($"{word} & {pair}");
-        // Each pair of words should displayed on its own line.
+        var seen = new HashSet<string>();
+        var pairs = new List<(string, string)>();
+
+        foreach (var word in words) {
+            var reversed = new string(new char[] { word[1], word[0] });
+            if (seen.Contains(reversed)) {
+                pairs.Add((word, reversed));
+            } else {
+                seen.Add(word);
+            }
+        }
+
+        foreach (var pair in pairs) {
+            Console.WriteLine($"{pair.Item1} & {pair.Item2}");
+        }
     }
 
     /// <summary>
@@ -131,6 +145,14 @@ public static class SetsAndMapsTester {
         var degrees = new Dictionary<string, int>();
         foreach (var line in File.ReadLines(filename)) {
             var fields = line.Split(",");
+            if(fields.Length > 3) {
+                var degree = fields[3].Trim();
+                if (degrees.ContainsKey(degree)) {
+                    degrees[degree] ++;
+                } else {
+                    degrees.Add(degree, 1);
+                }
+            }
             // Todo Problem 2 - ADD YOUR CODE HERE
         }
 
@@ -157,8 +179,42 @@ public static class SetsAndMapsTester {
     /// # Problem 3 #
     /// #############
     private static bool IsAnagram(string word1, string word2) {
-        // Todo Problem 3 - ADD YOUR CODE HERE
-        return false;
+        // Normalize the strings
+        word1 = word1.Replace(" ", "").ToLower();
+        word2 = word2.Replace(" ", "").ToLower();
+
+        // If lengths are not the same, they cannot be anagrams
+        if (word1.Length != word2.Length) {
+            return false;
+        }
+
+        // Dictionary to count character occurrences
+        var charCount = new Dictionary<char, int>();
+
+        // Count characters in the first word
+        foreach (var c in word1) {
+            if (charCount.ContainsKey(c)) {
+                charCount[c]++;
+            } else {
+                charCount.Add(c, 1);
+            }
+        }
+
+        // Decrease count for characters in the second word
+        foreach (var c in word2) {
+            if (charCount.ContainsKey(c)) {
+                charCount[c]--;
+                if (charCount[c] == 0) {
+                    charCount.Remove(c);
+                }
+            } else {
+                return false; // If a character in word2 doesn't exist in word1
+            }
+        }
+
+        // Check if all counts are zero
+        return charCount.Count == 0;
+        
     }
 
     /// <summary>
@@ -231,9 +287,13 @@ public static class SetsAndMapsTester {
 
         var featureCollection = JsonSerializer.Deserialize<FeatureCollection>(json, options);
 
-        // TODO:
-        // 1. Add code in FeatureCollection.cs to describe the JSON using classes and properties 
-        // on those classes so that the call to Deserialize above works properly.
-        // 2. Add code below to print out each place a earthquake has happened today and its magitude.
+        foreach (var feature in featureCollection.Features) {
+            var place = feature.Properties.Place;
+            var mag = feature.Properties.Mag;
+
+            if (!string.IsNullOrEmpty(place) && mag.HasValue) {
+                Console.WriteLine($"{place} - Mag {mag.Value}");
+            }
+        }    
     }
 }
